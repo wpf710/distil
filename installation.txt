@@ -1,0 +1,67 @@
+Basic Installation of Distil 
+
+
+Environment:  OS
+Operating System:  RHEL7
+Requirement: python >= 2.7
+
+1. Get the code of Distil from github
+	git clone https://github.com/stackforge/distil
+
+2. Install the requirement before installing Distil
+
+    a. Install pip in the system.
+        For RHEL 7, import a Fedora source list and install pip via yum. Like below:
+        rpm -iUvh http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+        yum -y update
+        yum -y install python-pip
+
+    b. Install requirements of Distil
+	In the distil path, run 'pip install -r requirement.txt'
+	Note: If we faced the problem of Error: pg_config executable not found. Please run 'yum install python-devel postgresql-devel'.then rerun 'pip install -r requirement.txt'
+
+     	under Ubuntu:
+
+ 		if EnvironmentError: mysql_config not found,  then 
+			
+ 			install  libmysqld-dev, libmysqlclient-dev 
+
+    c. update the python-keystoneclient
+	The requirement.txt did not have the dependency of python-keystoneclient, but python-novaclient depend a package in the latest  python-keystoneclient, so we have to update the  python-keystoneclient manually.
+	pip search python-keystoneclient
+	pip install python-keystoneclient --upgrade
+
+3. Create database and init the tables
+
+    a. Install mysqldb or mairadb on the system
+    b. Check the mysql/mariadb port, the default is 3306
+    c. Login database and set password of the database
+    d. create a database named billing
+    e. turn to path distil/distil, run  
+'python initdb.py ¨Cdb_uri 'mysql://username:password@ipaddress:port/billing?charset=utf8'
+
+4. install distil and simple configure 
+
+    a. In distil path run 'python setup.py install'
+
+    b. In the distil/example path edit the conf.yaml
++++++++++++++++++++++++++++++++++++
+region: RegionOne
+database_uri:  mysql://username:password@ipaddress:port/billing
+log_file: /var/log/distil/billing.log # please create /var/log/distil manually
+
+auth:
+  end_point: http://ipaddress:5000/v2.0
+  default_tenant: xxxx
+  username: xxxxx
+  password: xxxxx
+  identity_url: http://ipaddress:35357
+++++++++++++++++++++++++++++++++++++
+
+5. starting and simple usage
+    a. In the distil/bin path, run 'python web.py -c configuration path -i ipaddress -p port'
+
+    b. source the environment of openrc in the /root path, and add an envrionment 	DISTIL_URL=http://ipaddress:port
+    c. In the distil/client path, run 'python shell.py ¨Chelp' to get the usage.
+
+
