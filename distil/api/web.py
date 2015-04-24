@@ -176,7 +176,8 @@ def collect_usage(tenant, db, session, resp, end):
                 mappings = config.collection['meter_mappings']
 
                 for meter_name, meter_info in mappings.items():
-                    usage = tenant.usage(meter_name, window_start, window_end)
+                    mn = config.collection['meter_pairs'].get(meter_name, meter_name)
+                    usage = tenant.usage(mn, window_start, window_end)
                     usage_by_resource = {}
 
                     transformer = transformers[meter_info['transformer']]()
@@ -299,7 +300,7 @@ def get_usage():
     log.info("get_usage for %s %s %s" % (tenant_id, start, end))
 
     try:
-        start_dt = datetime.strptime(end, iso_time)
+        start_dt = datetime.strptime(start, iso_time)
     except ValueError:
         return 400, {'error': 'Invalid start datetime'}
 

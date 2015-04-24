@@ -1,29 +1,35 @@
 ---
 main:
-  region: nz_wlg_2
+  region: RegionOne 
   # timezone is unused at this time
-  timezone: Pacific/Auckland 
-  database_uri: postgres://admin:password@localhost:5432/billing
+  timezone: China/ShangHai 
+  database_uri: mysql://root:passw0rd@localhost:3306/billing?charset=utf8
   trust_sources: 
     - openstack
   log_file: logs/billing.log
   ignore_tenants:
     - test
+    - demo
+    - alt_demo
+    - invisible_to_admin
 rates_config:
-  file: test_rates.csv
+  file: /home/norman/distil/examples/real_rates.csv
 # Keystone auth user details
 auth:
-  end_point: http://localhost:5000/v2.0
-  default_tenant: demo
+  end_point: http://10.104.0.76:5000/v2.0
+  default_tenant: admin
   username: admin
-  password: openstack
+  password: admin
   insecure: True
   authenticate_clients: True
   # used for authenticate_clients
-  identity_url: http://localhost:35357
+  identity_url: http://10.104.0.76:35357
 # configuration for defining usage collection
 collection:
   max_windows_per_cycle: 4
+  # define what the meter in 'mater_mappings' is
+  meter_pairs:
+    state: instance
   # defines which meter is mapped to which transformer
   meter_mappings:
     # meter name as seen in ceilometer
@@ -45,7 +51,7 @@ collection:
           sources:
             - OS-EXT-AZ:availability_zone
     ip.floating:
-      service: n1.ipv4
+      service: ip.floating
       type: Floating IP
       transformer: GaugeMax
       unit: hour
@@ -55,7 +61,7 @@ collection:
             - address
             - floating_ip_address
     volume.size:
-      service: b1.standard
+      service: volume.size
       type: Volume
       transformer: GaugeMax
       unit: gigabyte
@@ -67,7 +73,7 @@ collection:
           sources:
             - availability_zone
     instance:
-      service: b1.standard
+      service: instance.root.disk
       type: Volume
       transformer: FromImage
       unit: gigabyte
@@ -86,7 +92,7 @@ collection:
           sources:
             - availability_zone
     image.size:
-      service: b1.standard
+      service: image.size
       type: Image
       transformer: GaugeMax
       unit: byte
@@ -140,7 +146,7 @@ transformers:
       - rescued
       - resized
   from_image:
-    service: b1.standard
+    service: instance.root.disk
     # What metadata values to check
     md_keys:
       - image_ref

@@ -36,7 +36,7 @@ class Uptime(Transformer):
         # get tracked states from config
         tracked = config.transformers['uptime']['tracked_states']
 
-        tracked_states = {constants.states[i] for i in tracked}
+        tracked_states = tracked #{constants.states[i] for i in tracked}
 
         usage_dict = {}
 
@@ -72,6 +72,9 @@ class Uptime(Transformer):
                     _add_usage(diff)
                     last_timestamp = val['timestamp']
                     seen_sample_in_window = True
+            
+            if val['timestamp'] > last_timestamp:
+                last_timestamp = val['timestamp']
 
             last_state = val
 
@@ -87,7 +90,11 @@ class Uptime(Transformer):
 
     def _clean_entry(self, entry):
         result = {
-            'counter_volume': entry['counter_volume'],
+            'counter_volume': entry['resource_metadata'].get(
+                'state', entry['resource_metadata'].get(
+                    'status', 'null'
+                )
+            ),
             'flavor': entry['resource_metadata'].get(
                 'flavor.id', entry['resource_metadata'].get(
                     'instance_flavor_id', 0

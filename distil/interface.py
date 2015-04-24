@@ -136,6 +136,7 @@ class Tenant(object):
 
         with timed('fetch global usage for meter %s' % meter_name):
             endpoint = self.conn.auth.get_ceilometer_endpoint()
+            log.info('fetch usage for meter %s' % meter_name)
             r = self.conn.session.get(
                 urlparse.urljoin(endpoint, '/v2/meters/%s' % meter_name),
                 headers={
